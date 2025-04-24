@@ -2,23 +2,39 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import BookGrid from '../components/BookGrid';
+import { toast } from '@/hooks/use-toast';
 
 const Books = () => {
   const navigate = useNavigate();
-  const books = [
-    { id: 1, title: "Book 1" },
-    { id: 2, title: "Book 2" },
-    { id: 3, title: "Book 3" },
-    { id: 4, title: "Book 4" },
-    { id: 5, title: "Book 5" },
-  ];
+  const [books, setBooks] = React.useState([
+    { id: 1, title: "Book 1", progress: 75 },
+    { id: 2, title: "Book 2", progress: 30 },
+    { id: 3, title: "Book 3", progress: 0 },
+    { id: 4, title: "Book 4", progress: 50 },
+    { id: 5, title: "Book 5", progress: 10 },
+  ]);
 
   const handleBookSelect = (bookId: number) => {
     navigate(`/books/${bookId}/stages`);
   };
 
   const handleCreateNew = () => {
-    console.log("Create new book clicked");
+    const newId = Math.max(...books.map(b => b.id)) + 1;
+    setBooks([...books, { id: newId, title: `New Book ${newId}`, progress: 0 }]);
+    toast({
+      title: "Book created",
+      description: "A new book has been added to your list.",
+    });
+  };
+
+  const handleUpdateBook = (bookId: number, newTitle: string) => {
+    setBooks(books.map(book => 
+      book.id === bookId ? { ...book, title: newTitle } : book
+    ));
+    toast({
+      title: "Book updated",
+      description: "The book title has been updated.",
+    });
   };
 
   return (
@@ -29,6 +45,7 @@ const Books = () => {
           books={books}
           onBookSelect={handleBookSelect}
           onCreateNew={handleCreateNew}
+          onUpdateBook={handleUpdateBook}
         />
       </div>
     </div>
