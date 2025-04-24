@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import BookGrid from '../components/BookGrid';
 import { toast } from '@/hooks/use-toast';
+import { Trash2 } from 'lucide-react';
 
 const Books = () => {
   const navigate = useNavigate();
@@ -19,8 +20,14 @@ const Books = () => {
   };
 
   const handleCreateNew = () => {
-    const newId = Math.max(...books.map(b => b.id)) + 1;
-    setBooks([...books, { id: newId, title: `New Book ${newId}`, progress: 0, isCompleted: false }]);
+    const newId = Math.max(...books.map(b => b.id), 0) + 1;
+    const newBook = { 
+      id: newId, 
+      title: `New Book ${newId}`, 
+      progress: 0, 
+      isCompleted: false 
+    };
+    setBooks([...books, newBook]);
     toast({
       title: "Book created",
       description: "A new book has been added to your list.",
@@ -37,6 +44,14 @@ const Books = () => {
     });
   };
 
+  const handleDeleteBook = (bookId: number) => {
+    setBooks(books.filter(book => book.id !== bookId));
+    toast({
+      title: "Book deleted",
+      description: "The book has been removed from your list.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto py-6">
@@ -46,6 +61,7 @@ const Books = () => {
           onBookSelect={handleBookSelect}
           onCreateNew={handleCreateNew}
           onUpdateBook={handleUpdateBook}
+          onDeleteBook={handleDeleteBook}
         />
       </div>
     </div>

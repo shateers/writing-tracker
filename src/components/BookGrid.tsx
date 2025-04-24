@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
-import { Plus, Check } from 'lucide-react';
+import { Plus, Check, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 
 interface Book {
   id: number;
@@ -18,22 +19,32 @@ interface BookGridProps {
   onBookSelect: (bookId: number) => void;
   onCreateNew: () => void;
   onUpdateBook?: (bookId: number, newTitle: string) => void;
+  onDeleteBook?: (bookId: number) => void;
 }
 
-const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook }: BookGridProps) => {
+const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook }: BookGridProps) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
 
   const handleDoubleClick = (book: Book) => {
-    setEditingId(book.id);
-    setEditValue(book.title);
+    if (onUpdateBook) {
+      setEditingId(book.id);
+      setEditValue(book.title);
+    }
   };
 
   const handleSave = (bookId: number) => {
-    if (onUpdateBook) {
+    if (onUpdateBook && editValue.trim()) {
       onUpdateBook(bookId, editValue);
     }
     setEditingId(null);
+  };
+
+  const handleDelete = (e: React.MouseEvent, bookId: number) => {
+    e.stopPropagation();
+    if (onDeleteBook) {
+      onDeleteBook(bookId);
+    }
   };
 
   return (
@@ -51,7 +62,7 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook }: BookGridPr
         {books.map((book) => (
           <Card
             key={book.id}
-            className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors ${
+            className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors relative ${
               book.isCompleted ? 'bg-green-100 border-green-500' : ''
             } ${book.isSelected ? 'border-2 border-black' : ''}`}
             onClick={() => onBookSelect(book.id)}
@@ -92,6 +103,14 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook }: BookGridPr
                 </div>
               )}
             </div>
+            <Button
+              variant="destructive"
+              size="icon"
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 hover:opacity-100"
+              onClick={(e) => handleDelete(e, book.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </Card>
         ))}
       </div>
