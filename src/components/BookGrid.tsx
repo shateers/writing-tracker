@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Check } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
@@ -10,6 +10,7 @@ interface Book {
   title: string;
   isSelected?: boolean;
   progress?: number;
+  isCompleted?: boolean;
 }
 
 interface BookGridProps {
@@ -51,29 +52,44 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook }: BookGridPr
           <Card
             key={book.id}
             className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors ${
-              book.isSelected ? 'border-2 border-black' : ''
-            }`}
+              book.isCompleted ? 'bg-green-100 border-green-500' : ''
+            } ${book.isSelected ? 'border-2 border-black' : ''}`}
             onClick={() => onBookSelect(book.id)}
             onDoubleClick={() => handleDoubleClick(book)}
           >
             <div className="space-y-4">
-              {editingId === book.id ? (
-                <Input
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleSave(book.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSave(book.id);
-                    }
-                  }}
-                  autoFocus
-                />
-              ) : (
-                <h3 className="text-lg font-medium">{book.title}</h3>
-              )}
+              <div className="flex justify-between items-center">
+                {editingId === book.id ? (
+                  <Input
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={() => handleSave(book.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSave(book.id);
+                      }
+                    }}
+                    autoFocus
+                    className="flex-1"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <h3 className="text-lg font-medium">{book.title}</h3>
+                )}
+                {book.isCompleted && (
+                  <div className="rounded-full bg-green-500 p-1">
+                    <Check className="w-4 h-4 text-white" />
+                  </div>
+                )}
+              </div>
               {book.progress !== undefined && (
-                <Progress value={book.progress} className="h-2" />
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span>Progress</span>
+                    <span>{Math.round(book.progress)}%</span>
+                  </div>
+                  <Progress value={book.progress} className="h-2" />
+                </div>
               )}
             </div>
           </Card>

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import TaskList from '../components/TaskList';
@@ -16,13 +16,33 @@ const Tasks = () => {
     { id: 4, title: "Set timeline goals", isCompleted: false },
   ]);
 
+  // Calculate stage progress based on tasks
+  useEffect(() => {
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter(task => task.isCompleted).length;
+    const stageProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+    const isStageCompleted = stageProgress === 100;
+    
+    // In a real app, this would update the stage's progress in a database or global state
+    console.log(`Stage ${stageId} progress: ${stageProgress}%, completed: ${isStageCompleted}`);
+  }, [tasks, stageId]);
+
   const handleTaskToggle = (taskId: number) => {
     setTasks(tasks.map(task => 
       task.id === taskId ? { ...task, isCompleted: !task.isCompleted } : task
     ));
+
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, isCompleted: !task.isCompleted } : task
+    );
+    
+    const allCompleted = updatedTasks.every(task => task.isCompleted);
+    
     toast({
       title: "Task status updated",
-      description: "The task completion status has been updated.",
+      description: allCompleted ? 
+        "All tasks completed! Stage is now complete." : 
+        "The task completion status has been updated.",
     });
   };
 

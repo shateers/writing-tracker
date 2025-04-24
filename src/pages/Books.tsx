@@ -7,11 +7,11 @@ import { toast } from '@/hooks/use-toast';
 const Books = () => {
   const navigate = useNavigate();
   const [books, setBooks] = React.useState([
-    { id: 1, title: "Book 1", progress: 75 },
-    { id: 2, title: "Book 2", progress: 30 },
-    { id: 3, title: "Book 3", progress: 0 },
-    { id: 4, title: "Book 4", progress: 50 },
-    { id: 5, title: "Book 5", progress: 10 },
+    { id: 1, title: "Book 1", progress: 75, isCompleted: false },
+    { id: 2, title: "Book 2", progress: 30, isCompleted: false },
+    { id: 3, title: "Book 3", progress: 0, isCompleted: false },
+    { id: 4, title: "Book 4", progress: 50, isCompleted: true },
+    { id: 5, title: "Book 5", progress: 10, isCompleted: false },
   ]);
 
   const handleBookSelect = (bookId: number) => {
@@ -20,7 +20,7 @@ const Books = () => {
 
   const handleCreateNew = () => {
     const newId = Math.max(...books.map(b => b.id)) + 1;
-    setBooks([...books, { id: newId, title: `New Book ${newId}`, progress: 0 }]);
+    setBooks([...books, { id: newId, title: `New Book ${newId}`, progress: 0, isCompleted: false }]);
     toast({
       title: "Book created",
       description: "A new book has been added to your list.",

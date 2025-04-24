@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import StageList from '../components/StageList';
@@ -15,6 +15,16 @@ const Stages = () => {
     { id: 3, title: "Stage 3 (Editing)", isCompleted: false, progress: 30 },
     { id: 4, title: "Stage 4 (Marketing)", isCompleted: false, progress: 0 },
   ]);
+
+  // Calculate book progress based on stages and update the parent book
+  useEffect(() => {
+    const totalStages = stages.length;
+    const completedStages = stages.filter(stage => stage.isCompleted).length;
+    const overallProgress = totalStages > 0 ? (completedStages / totalStages) * 100 : 0;
+    
+    // In a real app, this would update the book's progress in a database or global state
+    console.log(`Book ${bookId} progress: ${overallProgress}%`);
+  }, [stages, bookId]);
 
   const handleStageSelect = (stageId: number) => {
     navigate(`/books/${bookId}/stages/${stageId}/tasks`);

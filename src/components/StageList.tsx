@@ -42,7 +42,9 @@ const StageList = ({ stages, onStageSelect, onUpdateStage, onToggleComplete }: S
       {stages.map((stage) => (
         <div
           key={stage.id}
-          className="flex items-center justify-between p-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors"
+          className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors ${
+            stage.isCompleted ? 'bg-green-100' : 'bg-white'
+          }`}
           onClick={() => onStageSelect(stage.id)}
           onDoubleClick={() => handleDoubleClick(stage)}
         >

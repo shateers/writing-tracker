@@ -39,7 +39,9 @@ const TaskList = ({ tasks, onTaskToggle, onUpdateTask }: TaskListProps) => {
       {tasks.map((task) => (
         <div
           key={task.id}
-          className="flex items-center justify-between p-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors"
+          className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors ${
+            task.isCompleted ? 'bg-green-100' : 'bg-white'
+          }`}
           onDoubleClick={() => handleDoubleClick(task)}
         >
           {editingId === task.id ? (
@@ -61,7 +63,10 @@ const TaskList = ({ tasks, onTaskToggle, onUpdateTask }: TaskListProps) => {
           )}
           <div 
             className="w-6 h-6 flex items-center justify-center"
-            onClick={() => onTaskToggle(task.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onTaskToggle(task.id);
+            }}
           >
             {task.isCompleted ? (
               <div className="rounded-full bg-green-500 p-1">
