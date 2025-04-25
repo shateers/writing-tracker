@@ -26,7 +26,8 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
 
-  const handleDoubleClick = (book: Book) => {
+  const handleDoubleClick = (e: React.MouseEvent, book: Book) => {
+    e.stopPropagation(); // Stop click from triggering navigation
     if (onUpdateBook) {
       setEditingId(book.id);
       setEditValue(book.title);
@@ -47,6 +48,18 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook
     }
   };
 
+  const handleInputClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card onClick from firing
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && editingId) {
+      handleSave(editingId);
+    } else if (e.key === 'Escape') {
+      setEditingId(null);
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -62,11 +75,10 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook
         {books.map((book) => (
           <Card
             key={book.id}
-            className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors relative ${
+            className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors relative group ${
               book.isCompleted ? 'bg-green-100 border-green-500' : ''
             } ${book.isSelected ? 'border-2 border-black' : ''}`}
             onClick={() => onBookSelect(book.id)}
-            onDoubleClick={() => handleDoubleClick(book)}
           >
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -75,17 +87,18 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
                     onBlur={() => handleSave(book.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleSave(book.id);
-                      }
-                    }}
+                    onKeyDown={handleKeyDown}
                     autoFocus
                     className="flex-1"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={handleInputClick}
                   />
                 ) : (
-                  <h3 className="text-lg font-medium">{book.title}</h3>
+                  <h3 
+                    className="text-lg font-medium break-words cursor-text"
+                    onDoubleClick={(e) => handleDoubleClick(e, book)}
+                  >
+                    {book.title}
+                  </h3>
                 )}
                 {book.isCompleted && (
                   <div className="rounded-full bg-green-500 p-1">

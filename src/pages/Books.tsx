@@ -2,7 +2,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import BookGrid from '../components/BookGrid';
-import { toast } from '@/hooks/use-toast';
 import { Trash2 } from 'lucide-react';
 
 const Books = () => {
@@ -28,28 +27,16 @@ const Books = () => {
       isCompleted: false 
     };
     setBooks([...books, newBook]);
-    toast({
-      title: "Book created",
-      description: "A new book has been added to your list.",
-    });
   };
 
   const handleUpdateBook = (bookId: number, newTitle: string) => {
     setBooks(books.map(book => 
       book.id === bookId ? { ...book, title: newTitle } : book
     ));
-    toast({
-      title: "Book updated",
-      description: "The book title has been updated.",
-    });
   };
 
   const handleDeleteBook = (bookId: number) => {
     setBooks(books.filter(book => book.id !== bookId));
-    toast({
-      title: "Book deleted",
-      description: "The book has been removed from your list.",
-    });
   };
 
   return (
