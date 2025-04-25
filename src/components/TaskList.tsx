@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Check, X, Trash2 } from 'lucide-react';
+import { Check, X, Trash2, Edit } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -21,7 +21,7 @@ const TaskList = ({ tasks, onTaskToggle, onUpdateTask, onDeleteTask }: TaskListP
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
 
-  const handleDoubleClick = (e: React.MouseEvent, task: Task) => {
+  const handleEditStart = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
     if (onUpdateTask) {
       setEditingId(task.id);
@@ -77,8 +77,7 @@ const TaskList = ({ tasks, onTaskToggle, onUpdateTask, onDeleteTask }: TaskListP
             />
           ) : (
             <span 
-              className="text-sm cursor-text flex-1"
-              onDoubleClick={(e) => handleDoubleClick(e, task)}
+              className="text-sm flex-1"
             >
               {task.title}
             </span>
@@ -101,16 +100,26 @@ const TaskList = ({ tasks, onTaskToggle, onUpdateTask, onDeleteTask }: TaskListP
                 </div>
               )}
             </div>
-            {onDeleteTask && (
+            <div className="flex items-center gap-1">
               <Button
-                variant="destructive"
+                variant="ghost"
                 size="icon"
                 className="h-6 w-6 opacity-0 group-hover:opacity-100"
-                onClick={(e) => handleDelete(e, task.id)}
+                onClick={(e) => handleEditStart(e, task)}
               >
-                <Trash2 className="h-3 w-3" />
+                <Edit className="h-3 w-3" />
               </Button>
-            )}
+              {onDeleteTask && (
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                  onClick={(e) => handleDelete(e, task.id)}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       ))}

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus, Check, Trash2 } from 'lucide-react';
+import { Plus, Check, Trash2, Edit } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
@@ -26,7 +26,7 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
 
-  const handleDoubleClick = (e: React.MouseEvent, book: Book) => {
+  const handleEditStart = (e: React.MouseEvent, book: Book) => {
     e.stopPropagation(); // Stop click from triggering navigation
     if (onUpdateBook) {
       setEditingId(book.id);
@@ -78,7 +78,10 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook
             className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors relative group ${
               book.isCompleted ? 'bg-green-100 border-green-500' : ''
             } ${book.isSelected ? 'border-2 border-black' : ''}`}
-            onClick={() => onBookSelect(book.id)}
+            onClick={() => {
+              // Add a slight delay to navigation to allow edit buttons to work
+              setTimeout(() => onBookSelect(book.id), 150);
+            }}
           >
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -93,10 +96,7 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook
                     onClick={handleInputClick}
                   />
                 ) : (
-                  <h3 
-                    className="text-lg font-medium break-words cursor-text"
-                    onDoubleClick={(e) => handleDoubleClick(e, book)}
-                  >
+                  <h3 className="text-lg font-medium break-words">
                     {book.title}
                   </h3>
                 )}
@@ -116,14 +116,26 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook
                 </div>
               )}
             </div>
-            <Button
-              variant="destructive"
-              size="icon"
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 hover:opacity-100"
-              onClick={(e) => handleDelete(e, book.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 flex space-x-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 hover:bg-gray-200"
+                onClick={(e) => handleEditStart(e, book)}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+              {onDeleteBook && (
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={(e) => handleDelete(e, book.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </Card>
         ))}
       </div>

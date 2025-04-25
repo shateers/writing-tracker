@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Check, X, Trash2 } from 'lucide-react';
+import { Check, X, Trash2, Edit } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ const StageList = ({ stages, onStageSelect, onUpdateStage, onToggleComplete, onD
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
 
-  const handleDoubleClick = (e: React.MouseEvent, stage: Stage) => {
+  const handleEditStart = (e: React.MouseEvent, stage: Stage) => {
     e.stopPropagation();
     if (onUpdateStage) {
       setEditingId(stage.id);
@@ -67,7 +67,10 @@ const StageList = ({ stages, onStageSelect, onUpdateStage, onToggleComplete, onD
           className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors relative group ${
             stage.isCompleted ? 'bg-green-100' : 'bg-white'
           }`}
-          onClick={() => onStageSelect(stage.id)}
+          onClick={() => {
+            // Add a slight delay to navigation to allow edit buttons to work
+            setTimeout(() => onStageSelect(stage.id), 150);
+          }}
         >
           <div className="flex-1 mr-4">
             {editingId === stage.id ? (
@@ -80,10 +83,7 @@ const StageList = ({ stages, onStageSelect, onUpdateStage, onToggleComplete, onD
                 onClick={handleInputClick}
               />
             ) : (
-              <span 
-                className="text-sm cursor-text"
-                onDoubleClick={(e) => handleDoubleClick(e, stage)}
-              >
+              <span className="text-sm">
                 {stage.title}
               </span>
             )}
@@ -111,14 +111,24 @@ const StageList = ({ stages, onStageSelect, onUpdateStage, onToggleComplete, onD
                 </div>
               )}
             </div>
-            <Button
-              variant="destructive"
-              size="icon"
-              className="h-6 w-6 opacity-0 group-hover:opacity-100"
-              onClick={(e) => handleDelete(e, stage.id)}
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                onClick={(e) => handleEditStart(e, stage)}
+              >
+                <Edit className="h-3 w-3" />
+              </Button>
+              <Button
+                variant="destructive"
+                size="icon"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                onClick={(e) => handleDelete(e, stage.id)}
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
         </div>
       ))}
