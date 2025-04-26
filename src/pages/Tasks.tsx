@@ -1,9 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Plus } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import TaskList from '../components/TaskList';
 import { Button } from '@/components/ui/button';
+import { useToast } from "@/hooks/use-toast";
+import { taskService, Task } from '../services/taskService';
 import { 
   Breadcrumb, 
   BreadcrumbItem, 
@@ -15,49 +18,107 @@ import {
 const Tasks = () => {
   const navigate = useNavigate();
   const { bookId, stageId } = useParams();
-  const [tasks, setTasks] = useState([
-    { id: 1, title: "Brainstorm core concept", isCompleted: true },
-    { id: 2, title: "Develop character sketches", isCompleted: false },
-    { id: 3, title: "Create rough outline", isCompleted: false },
-    { id: 4, title: "Set timeline goals", isCompleted: false },
-  ]);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
-  // Calculate stage progress based on tasks
-  useEffect(() => {
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(task => task.isCompleted).length;
-    const stageProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-    const isStageCompleted = stageProgress === 100;
-    
-    // In a real app, this would update the stage's progress in a database or global state
-    console.log(`Stage ${stageId} progress: ${stageProgress}%, completed: ${isStageCompleted}`);
-  }, [tasks, stageId]);
+  if (!stageId) {
+    return <div>Stage ID is missing</div>;
+  }
 
-  const handleTaskToggle = (taskId: number) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, isCompleted: !task.isCompleted } : task
-    ));
+  const { data: tasks = [], isLoading } = useQuery({
+    queryKey: ['tasks', stageId],
+    queryFn: () => taskService.getTasks(stageId),
+  });
+
+  const createTaskMutation = useMutation({
+    mutationFn: (title: string) => taskService.createTask(stageId, title),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', stageId] });
+      queryClient.invalidateQueries({ queryKey: ['stages', bookId] });
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      toast({
+        title: "Success",
+        description: "Task created successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create task",
+        variant: "destructive",
+      });
+      console.error('Error creating task:', error);
+    },
+  });
+
+  const updateTaskMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Task> }) => 
+      taskService.updateTask(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', stageId] });
+      queryClient.invalidateQueries({ queryKey: ['stages', bookId] });
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      toast({
+        title: "Success",
+        description: "Task updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update task",
+        variant: "destructive",
+      });
+      console.error('Error updating task:', error);
+    },
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: taskService.deleteTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', stageId] });
+      queryClient.invalidateQueries({ queryKey: ['stages', bookId] });
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      toast({
+        title: "Success",
+        description: "Task deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete task",
+        variant: "destructive",
+      });
+      console.error('Error deleting task:', error);
+    },
+  });
+
+  const handleTaskToggle = (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      updateTaskMutation.mutate({ 
+        id: taskId, 
+        updates: { is_completed: !task.is_completed } 
+      });
+    }
   };
 
-  const handleUpdateTask = (taskId: number, newTitle: string) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, title: newTitle } : task
-    ));
+  const handleUpdateTask = (taskId: string, newTitle: string) => {
+    updateTaskMutation.mutate({ id: taskId, updates: { title: newTitle } });
   };
 
   const handleCreateTask = () => {
-    const newId = Math.max(...tasks.map(t => t.id), 0) + 1;
-    const newTask = {
-      id: newId,
-      title: `Task ${newId}`,
-      isCompleted: false
-    };
-    setTasks([...tasks, newTask]);
+    createTaskMutation.mutate(`New Task`);
   };
 
-  const handleDeleteTask = (taskId: number) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
+  const handleDeleteTask = (taskId: string) => {
+    deleteTaskMutation.mutate(taskId);
   };
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -74,7 +135,7 @@ const Tasks = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink>Stage {stageId} Tasks</BreadcrumbLink>
+                <BreadcrumbLink>Tasks</BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>

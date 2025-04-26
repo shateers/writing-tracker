@@ -6,22 +6,23 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 
 interface Stage {
-  id: number;
+  id: string; // Changed from number to string
   title: string;
-  isCompleted: boolean;
+  isCompleted?: boolean;
+  is_completed?: boolean; // Added to match Supabase schema
   progress?: number;
 }
 
 interface StageListProps {
   stages: Stage[];
-  onStageSelect: (stageId: number) => void;
-  onUpdateStage?: (stageId: number, newTitle: string) => void;
-  onToggleComplete?: (stageId: number) => void;
-  onDeleteStage?: (stageId: number) => void;
+  onStageSelect: (stageId: string) => void; // Changed from number to string
+  onUpdateStage?: (stageId: string, newTitle: string) => void; // Changed from number to string
+  onToggleComplete?: (stageId: string) => void; // Changed from number to string
+  onDeleteStage?: (stageId: string) => void; // Changed from number to string
 }
 
 const StageList = ({ stages, onStageSelect, onUpdateStage, onToggleComplete, onDeleteStage }: StageListProps) => {
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null); // Changed from number to string
   const [editValue, setEditValue] = useState('');
 
   const handleEditStart = (e: React.MouseEvent, stage: Stage) => {
@@ -32,7 +33,7 @@ const StageList = ({ stages, onStageSelect, onUpdateStage, onToggleComplete, onD
     }
   };
 
-  const handleSave = (stageId: number) => {
+  const handleSave = (stageId: string) => { // Changed from number to string
     if (onUpdateStage && editValue.trim()) {
       onUpdateStage(stageId, editValue);
     }
@@ -51,7 +52,7 @@ const StageList = ({ stages, onStageSelect, onUpdateStage, onToggleComplete, onD
     }
   };
 
-  const handleDelete = (e: React.MouseEvent, stageId: number) => {
+  const handleDelete = (e: React.MouseEvent, stageId: string) => { // Changed from number to string
     e.stopPropagation();
     if (onDeleteStage) {
       onDeleteStage(stageId);
@@ -65,7 +66,7 @@ const StageList = ({ stages, onStageSelect, onUpdateStage, onToggleComplete, onD
         <div
           key={stage.id}
           className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors relative group ${
-            stage.isCompleted ? 'bg-green-100' : 'bg-white'
+            (stage.isCompleted || stage.is_completed) ? 'bg-green-100' : 'bg-white'
           }`}
           onClick={() => {
             // Add a slight delay to navigation to allow edit buttons to work
@@ -101,7 +102,7 @@ const StageList = ({ stages, onStageSelect, onUpdateStage, onToggleComplete, onD
                 }
               }}
             >
-              {stage.isCompleted ? (
+              {(stage.isCompleted || stage.is_completed) ? (
                 <div className="rounded-full bg-green-500 p-1">
                   <Check className="w-4 h-4 text-white" />
                 </div>

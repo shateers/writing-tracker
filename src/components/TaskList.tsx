@@ -5,20 +5,21 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 interface Task {
-  id: number;
+  id: string; // Changed from number to string
   title: string;
-  isCompleted: boolean;
+  isCompleted?: boolean;
+  is_completed?: boolean; // Added to match Supabase schema
 }
 
 interface TaskListProps {
   tasks: Task[];
-  onTaskToggle: (taskId: number) => void;
-  onUpdateTask?: (taskId: number, newTitle: string) => void;
-  onDeleteTask?: (taskId: number) => void;
+  onTaskToggle: (taskId: string) => void; // Changed from number to string
+  onUpdateTask?: (taskId: string, newTitle: string) => void; // Changed from number to string
+  onDeleteTask?: (taskId: string) => void; // Changed from number to string
 }
 
 const TaskList = ({ tasks, onTaskToggle, onUpdateTask, onDeleteTask }: TaskListProps) => {
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null); // Changed from number to string
   const [editValue, setEditValue] = useState('');
 
   const handleEditStart = (e: React.MouseEvent, task: Task) => {
@@ -29,7 +30,7 @@ const TaskList = ({ tasks, onTaskToggle, onUpdateTask, onDeleteTask }: TaskListP
     }
   };
 
-  const handleSave = (taskId: number) => {
+  const handleSave = (taskId: string) => { // Changed from number to string
     if (onUpdateTask && editValue.trim()) {
       onUpdateTask(taskId, editValue);
     }
@@ -48,7 +49,7 @@ const TaskList = ({ tasks, onTaskToggle, onUpdateTask, onDeleteTask }: TaskListP
     }
   };
 
-  const handleDelete = (e: React.MouseEvent, taskId: number) => {
+  const handleDelete = (e: React.MouseEvent, taskId: string) => { // Changed from number to string
     e.stopPropagation();
     if (onDeleteTask) {
       onDeleteTask(taskId);
@@ -62,7 +63,7 @@ const TaskList = ({ tasks, onTaskToggle, onUpdateTask, onDeleteTask }: TaskListP
         <div
           key={task.id}
           className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors relative group ${
-            task.isCompleted ? 'bg-green-100' : 'bg-white'
+            (task.isCompleted || task.is_completed) ? 'bg-green-100' : 'bg-white'
           }`}
         >
           {editingId === task.id ? (
@@ -90,7 +91,7 @@ const TaskList = ({ tasks, onTaskToggle, onUpdateTask, onDeleteTask }: TaskListP
                 onTaskToggle(task.id);
               }}
             >
-              {task.isCompleted ? (
+              {(task.isCompleted || task.is_completed) ? (
                 <div className="rounded-full bg-green-500 p-1">
                   <Check className="w-4 h-4 text-white" />
                 </div>
