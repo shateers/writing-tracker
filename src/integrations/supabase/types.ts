@@ -9,7 +9,112 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      books: {
+        Row: {
+          created_at: string
+          id: string
+          is_completed: boolean | null
+          progress: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          progress?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          progress?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stages: {
+        Row: {
+          book_id: string | null
+          created_at: string
+          id: string
+          is_completed: boolean | null
+          order_position: number
+          progress: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          book_id?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          order_position: number
+          progress?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          book_id?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          order_position?: number
+          progress?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stages_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          created_at: string
+          id: string
+          is_completed: boolean | null
+          order_position: number
+          stage_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          order_position: number
+          stage_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          order_position?: number
+          stage_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "stages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,43 +1,98 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import BookGrid from '../components/BookGrid';
-import { Trash2 } from 'lucide-react';
+import { bookService } from '../services/bookService';
+import { useToast } from "@/components/ui/use-toast";
 
 const Books = () => {
   const navigate = useNavigate();
-  const [books, setBooks] = React.useState([
-    { id: 1, title: "Book 1", progress: 75, isCompleted: false },
-    { id: 2, title: "Book 2", progress: 30, isCompleted: false },
-    { id: 3, title: "Book 3", progress: 0, isCompleted: false },
-    { id: 4, title: "Book 4", progress: 50, isCompleted: true },
-    { id: 5, title: "Book 5", progress: 10, isCompleted: false },
-  ]);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const { data: books = [], isLoading } = useQuery({
+    queryKey: ['books'],
+    queryFn: bookService.getBooks,
+  });
+
+  const createBookMutation = useMutation({
+    mutationFn: bookService.createBook,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      toast({
+        title: "Success",
+        description: "Book created successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create book",
+        variant: "destructive",
+      });
+      console.error('Error creating book:', error);
+    },
+  });
+
+  const updateBookMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: any }) => 
+      bookService.updateBook(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      toast({
+        title: "Success",
+        description: "Book updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update book",
+        variant: "destructive",
+      });
+      console.error('Error updating book:', error);
+    },
+  });
+
+  const deleteBookMutation = useMutation({
+    mutationFn: bookService.deleteBook,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      toast({
+        title: "Success",
+        description: "Book deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete book",
+        variant: "destructive",
+      });
+      console.error('Error deleting book:', error);
+    },
+  });
 
   const handleBookSelect = (bookId: number) => {
     navigate(`/books/${bookId}/stages`);
   };
 
   const handleCreateNew = () => {
-    const newId = Math.max(...books.map(b => b.id), 0) + 1;
-    const newBook = { 
-      id: newId, 
-      title: `New Book ${newId}`, 
-      progress: 0, 
-      isCompleted: false 
-    };
-    setBooks([...books, newBook]);
+    createBookMutation.mutate("New Book");
   };
 
-  const handleUpdateBook = (bookId: number, newTitle: string) => {
-    setBooks(books.map(book => 
-      book.id === bookId ? { ...book, title: newTitle } : book
-    ));
+  const handleUpdateBook = (bookId: string, newTitle: string) => {
+    updateBookMutation.mutate({ id: bookId, updates: { title: newTitle } });
   };
 
-  const handleDeleteBook = (bookId: number) => {
-    setBooks(books.filter(book => book.id !== bookId));
+  const handleDeleteBook = (bookId: string) => {
+    deleteBookMutation.mutate(bookId);
   };
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
