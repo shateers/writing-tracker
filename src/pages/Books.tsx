@@ -74,6 +74,29 @@ const Books = () => {
     },
   });
 
+  const reorderBooksMutation = useMutation({
+    mutationFn: ({ books, sourceIndex, destinationIndex }: { 
+      books: any[]; 
+      sourceIndex: number; 
+      destinationIndex: number 
+    }) => bookService.reorderBooks(books, sourceIndex, destinationIndex),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      toast({
+        title: "Success",
+        description: "Books reordered successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to reorder books",
+        variant: "destructive",
+      });
+      console.error('Error reordering books:', error);
+    },
+  });
+
   const handleBookSelect = (bookId: string) => {
     navigate(`/books/${bookId}/stages`);
   };
@@ -90,6 +113,10 @@ const Books = () => {
     deleteBookMutation.mutate(bookId);
   };
 
+  const handleReorderBooks = (sourceIndex: number, destinationIndex: number) => {
+    reorderBooksMutation.mutate({ books, sourceIndex, destinationIndex });
+  };
+
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
@@ -104,6 +131,7 @@ const Books = () => {
           onCreateNew={handleCreateNew}
           onUpdateBook={handleUpdateBook}
           onDeleteBook={handleDeleteBook}
+          onReorderBooks={handleReorderBooks}
         />
       </div>
     </div>
