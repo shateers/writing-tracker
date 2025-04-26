@@ -74,7 +74,7 @@ const Books = () => {
     },
   });
 
-  const handleBookSelect = (bookId: number) => {
+  const handleBookSelect = (bookId: string) => {
     navigate(`/books/${bookId}/stages`);
   };
 

@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 
 interface Book {
-  id: number;
+  id: string; // Changed from number to string
   title: string;
   isSelected?: boolean;
   progress?: number;
@@ -16,14 +16,14 @@ interface Book {
 
 interface BookGridProps {
   books: Book[];
-  onBookSelect: (bookId: number) => void;
+  onBookSelect: (bookId: string) => void; // Changed from number to string
   onCreateNew: () => void;
-  onUpdateBook?: (bookId: number, newTitle: string) => void;
-  onDeleteBook?: (bookId: number) => void;
+  onUpdateBook?: (bookId: string, newTitle: string) => void; // Changed from number to string
+  onDeleteBook?: (bookId: string) => void; // Changed from number to string
 }
 
 const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook }: BookGridProps) => {
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null); // Changed from number to string
   const [editValue, setEditValue] = useState('');
 
   const handleEditStart = (e: React.MouseEvent, book: Book) => {
@@ -34,14 +34,14 @@ const BookGrid = ({ books, onBookSelect, onCreateNew, onUpdateBook, onDeleteBook
     }
   };
 
-  const handleSave = (bookId: number) => {
+  const handleSave = (bookId: string) => { // Changed from number to string
     if (onUpdateBook && editValue.trim()) {
       onUpdateBook(bookId, editValue);
     }
     setEditingId(null);
   };
 
-  const handleDelete = (e: React.MouseEvent, bookId: number) => {
+  const handleDelete = (e: React.MouseEvent, bookId: string) => { // Changed from number to string
     e.stopPropagation();
     if (onDeleteBook) {
       onDeleteBook(bookId);
