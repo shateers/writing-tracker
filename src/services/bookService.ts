@@ -8,7 +8,7 @@ export interface Book {
   is_completed: boolean;
   created_at: string;
   updated_at: string;
-  order_position?: number; // Added this field
+  order_position: number;
 }
 
 export const bookService = {
@@ -32,13 +32,16 @@ export const bookService = {
     
     if (maxOrderError) throw maxOrderError;
     
-    const newOrderPosition = (maxOrderData && maxOrderData.length > 0 && maxOrderData[0].order_position) 
+    const newOrderPosition = (maxOrderData && maxOrderData.length > 0) 
       ? maxOrderData[0].order_position + 1 
       : 1;
     
     const { data, error } = await supabase
       .from('books')
-      .insert([{ title, order_position: newOrderPosition }])
+      .insert([{ 
+        title, 
+        order_position: newOrderPosition 
+      }])
       .select()
       .single();
     
@@ -78,11 +81,14 @@ export const bookService = {
     // Update the order_position for all affected books
     const updates = reorderedBooks.map((book, index) => ({
       id: book.id,
+      title: book.title,
       order_position: index + 1  // Use 1-based indexing for order
     }));
     
     // Update all books in a single transaction
-    const { error } = await supabase.from('books').upsert(updates);
+    const { error } = await supabase
+      .from('books')
+      .upsert(updates, { onConflict: 'id' });
     
     if (error) throw error;
     return reorderedBooks;

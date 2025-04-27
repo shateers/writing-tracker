@@ -14,6 +14,7 @@ export type Database = {
           created_at: string
           id: string
           is_completed: boolean | null
+          order_position: number
           progress: number | null
           title: string
           updated_at: string
@@ -22,6 +23,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_completed?: boolean | null
+          order_position?: number
           progress?: number | null
           title: string
           updated_at?: string
@@ -30,6 +32,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_completed?: boolean | null
+          order_position?: number
           progress?: number | null
           title?: string
           updated_at?: string
