@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Stage {
@@ -67,5 +66,25 @@ export const stageService = {
       .eq('id', id);
     
     if (error) throw error;
+  },
+
+  async reorderStages(stages: Stage[], sourceIndex: number, destinationIndex: number) {
+    const reorderedStages = [...stages];
+    
+    const [removedStage] = reorderedStages.splice(sourceIndex, 1);
+    reorderedStages.splice(destinationIndex, 0, removedStage);
+    
+    const updates = reorderedStages.map((stage, index) => ({
+      id: stage.id,
+      title: stage.title,
+      order_position: index + 1
+    }));
+    
+    const { error } = await supabase
+      .from('stages')
+      .upsert(updates, { onConflict: 'id' });
+    
+    if (error) throw error;
+    return reorderedStages;
   }
 };

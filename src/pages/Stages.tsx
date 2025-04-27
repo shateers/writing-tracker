@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Plus } from 'lucide-react';
@@ -91,6 +90,29 @@ const Stages = () => {
     },
   });
 
+  const reorderStagesMutation = useMutation({
+    mutationFn: ({ stages, sourceIndex, destinationIndex }: { 
+      stages: Stage[]; 
+      sourceIndex: number; 
+      destinationIndex: number 
+    }) => stageService.reorderStages(stages, sourceIndex, destinationIndex),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stages', bookId] });
+      toast({
+        title: "Success",
+        description: "Stages reordered successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to reorder stages",
+        variant: "destructive",
+      });
+      console.error('Error reordering stages:', error);
+    },
+  });
+
   const handleStageSelect = (stageId: string) => {
     navigate(`/books/${bookId}/stages/${stageId}/tasks`);
   };
@@ -114,6 +136,12 @@ const Stages = () => {
         id: stageId, 
         updates: { is_completed: !stage.is_completed } 
       });
+    }
+  };
+
+  const handleReorderStages = (sourceIndex: number, destinationIndex: number) => {
+    if (stages) {
+      reorderStagesMutation.mutate({ stages, sourceIndex, destinationIndex });
     }
   };
 
@@ -159,6 +187,7 @@ const Stages = () => {
             onUpdateStage={handleUpdateStage}
             onToggleComplete={handleToggleComplete}
             onDeleteStage={handleDeleteStage}
+            onReorderStages={handleReorderStages}
           />
         </div>
       </div>
