@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Task {
@@ -66,5 +65,25 @@ export const taskService = {
       .eq('id', id);
     
     if (error) throw error;
+  },
+
+  async reorderTasks(tasks: Task[], sourceIndex: number, destinationIndex: number) {
+    const reorderedTasks = [...tasks];
+    
+    const [removedTask] = reorderedTasks.splice(sourceIndex, 1);
+    reorderedTasks.splice(destinationIndex, 0, removedTask);
+    
+    const updates = reorderedTasks.map((task, index) => ({
+      id: task.id,
+      title: task.title,
+      order_position: index + 1
+    }));
+    
+    const { error } = await supabase
+      .from('tasks')
+      .upsert(updates, { onConflict: 'id' });
+    
+    if (error) throw error;
+    return reorderedTasks;
   }
 };

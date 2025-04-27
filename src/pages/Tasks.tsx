@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Plus } from 'lucide-react';
@@ -94,6 +93,29 @@ const Tasks = () => {
     },
   });
 
+  const reorderTasksMutation = useMutation({
+    mutationFn: ({ tasks, sourceIndex, destinationIndex }: { 
+      tasks: Task[]; 
+      sourceIndex: number; 
+      destinationIndex: number 
+    }) => taskService.reorderTasks(tasks, sourceIndex, destinationIndex),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', stageId] });
+      toast({
+        title: "Success",
+        description: "Tasks reordered successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to reorder tasks",
+        variant: "destructive",
+      });
+      console.error('Error reordering tasks:', error);
+    },
+  });
+
   const handleTaskToggle = (taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (task) {
@@ -114,6 +136,12 @@ const Tasks = () => {
 
   const handleDeleteTask = (taskId: string) => {
     deleteTaskMutation.mutate(taskId);
+  };
+
+  const handleReorderTasks = (sourceIndex: number, destinationIndex: number) => {
+    if (tasks) {
+      reorderTasksMutation.mutate({ tasks, sourceIndex, destinationIndex });
+    }
   };
 
   if (isLoading) {
@@ -161,6 +189,7 @@ const Tasks = () => {
             onTaskToggle={handleTaskToggle}
             onUpdateTask={handleUpdateTask}
             onDeleteTask={handleDeleteTask}
+            onReorderTasks={handleReorderTasks}
           />
         </div>
       </div>
