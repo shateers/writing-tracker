@@ -32,8 +32,8 @@ export const bookService = {
     
     if (maxOrderError) throw maxOrderError;
     
-    const newOrderPosition = (maxOrderData && maxOrderData.length > 0) 
-      ? maxOrderData[0].order_position + 1 
+    const newOrderPosition = maxOrderData && maxOrderData.length > 0
+      ? (maxOrderData[0].order_position || 0) + 1 
       : 1;
     
     const { data, error } = await supabase
