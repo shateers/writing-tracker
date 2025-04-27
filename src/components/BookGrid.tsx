@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Plus, Check, Trash2, Edit, GripVertical } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import BookProgress from './BookProgress';
 
 interface Book {
   id: string;
@@ -12,6 +13,8 @@ interface Book {
   isSelected?: boolean;
   progress?: number;
   isCompleted?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface BookGridProps {
@@ -160,14 +163,13 @@ const BookGrid = ({
                                 </div>
                               )}
                             </div>
-                            {book.progress !== undefined && (
-                              <div>
-                                <div className="flex justify-between text-xs mb-1">
-                                  <span>Progress</span>
-                                  <span>{Math.round(book.progress)}%</span>
-                                </div>
-                                <Progress value={book.progress} className="h-2" />
-                              </div>
+                            
+                            {book.progress !== undefined && book.created_at && book.updated_at && (
+                              <BookProgress 
+                                progress={book.progress} 
+                                createdAt={book.created_at} 
+                                updatedAt={book.updated_at}
+                              />
                             )}
                           </div>
                           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 flex space-x-1">
