@@ -1,11 +1,20 @@
+
 import { supabase } from "@/integrations/supabase/client";
+
+export interface TaskReference {
+  type: 'link' | 'file';
+  title: string;
+  url: string;
+}
 
 export interface Task {
   id: string;
   stage_id: string;
   title: string;
+  description: string | null;
   is_completed: boolean;
   order_position: number;
+  task_references: TaskReference[] | null;
   created_at: string;
   updated_at: string;
 }
@@ -37,7 +46,9 @@ export const taskService = {
       .insert([{ 
         stage_id: stageId, 
         title, 
-        order_position: newPosition + 1 
+        order_position: newPosition + 1,
+        description: '',
+        task_references: []
       }])
       .select()
       .single();
@@ -87,3 +98,4 @@ export const taskService = {
     return reorderedTasks;
   }
 };
+

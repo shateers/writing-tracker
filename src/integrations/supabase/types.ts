@@ -83,28 +83,34 @@ export type Database = {
       tasks: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           is_completed: boolean | null
           order_position: number
           stage_id: string | null
+          task_references: Json | null
           title: string
           updated_at: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           is_completed?: boolean | null
           order_position: number
           stage_id?: string | null
+          task_references?: Json | null
           title: string
           updated_at?: string
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           is_completed?: boolean | null
           order_position?: number
           stage_id?: string | null
+          task_references?: Json | null
           title?: string
           updated_at?: string
         }
