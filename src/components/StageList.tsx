@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
-import { Check, X, Trash2, Edit } from 'lucide-react';
+import { Check, X, Trash2, Edit, GripVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { CircularProgress } from '@/components/ui/circular-progress';
 
 interface Stage {
   id: string;
@@ -73,6 +73,15 @@ const StageList = ({
     onReorderStages(result.source.index, result.destination.index);
   };
 
+  const getStatusColorClass = (progress?: number): string => {
+    if (progress === undefined) return 'bg-gray-200';
+    if (progress === 0) return 'bg-red-200';
+    if (progress === 100) return 'bg-green-200';
+    if (progress < 30) return 'bg-red-100';
+    if (progress < 70) return 'bg-amber-100';
+    return 'bg-green-100';
+  };
+
   return (
     <div className="space-y-3 p-6">
       <h2 className="text-xl font-semibold mb-4">Stages</h2>
@@ -96,30 +105,47 @@ const StageList = ({
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors relative group ${
-                        (stage.isCompleted || stage.is_completed) ? 'bg-green-100' : 'bg-white'
+                        (stage.isCompleted || stage.is_completed) ? 'bg-green-100' : getStatusColorClass(stage.progress)
                       } ${snapshot.isDragging ? 'shadow-lg' : ''}`}
                       onClick={() => {
                         setTimeout(() => onStageSelect(stage.id), 150);
                       }}
                     >
-                      <div className="flex-1 mr-4">
-                        {editingId === stage.id ? (
-                          <Input
-                            value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
-                            onBlur={() => handleSave(stage.id)}
-                            onKeyDown={handleKeyDown}
-                            autoFocus
-                            onClick={handleInputClick}
-                          />
-                        ) : (
-                          <span className="text-sm">
-                            {stage.title}
-                          </span>
-                        )}
-                        {stage.progress !== undefined && (
-                          <Progress value={stage.progress} className="h-2 mt-2" />
-                        )}
+                      <div className="flex items-center flex-1 mr-4">
+                        <div className="mr-3">
+                          {stage.progress !== undefined && (
+                            <CircularProgress 
+                              value={stage.progress} 
+                              size="small" 
+                              colorClass={stage.progress === 100 ? "text-green-500" : 
+                                         stage.progress > 0 ? "text-amber-500" : "text-red-500"} 
+                            />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          {editingId === stage.id ? (
+                            <Input
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              onBlur={() => handleSave(stage.id)}
+                              onKeyDown={handleKeyDown}
+                              autoFocus
+                              onClick={handleInputClick}
+                            />
+                          ) : (
+                            <div>
+                              <span className="text-sm font-medium">
+                                {stage.title}
+                              </span>
+                              {stage.progress !== undefined && (
+                                <div className="flex items-center mt-1">
+                                  <Progress value={stage.progress} className="h-2 flex-1" />
+                                  <span className="ml-2 text-xs text-gray-600">{stage.progress}%</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <div 

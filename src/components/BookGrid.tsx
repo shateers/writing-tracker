@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Check, Trash2, Edit, GripVertical } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -12,7 +11,7 @@ interface Book {
   title: string;
   isSelected?: boolean;
   progress?: number;
-  isCompleted?: boolean;
+  is_completed?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -71,6 +70,15 @@ const BookGrid = ({
     }
   };
 
+  const getStatusColorClass = (progress?: number): string => {
+    if (progress === undefined) return 'border-gray-200';
+    if (progress === 0) return 'border-red-200';
+    if (progress === 100) return 'border-green-500';
+    if (progress < 30) return 'border-red-300';
+    if (progress < 70) return 'border-amber-300';
+    return 'border-green-300';
+  };
+
   const onDragEnd = (result: DropResult) => {
     if (!result.destination || !onReorderBooks) {
       return;
@@ -123,8 +131,8 @@ const BookGrid = ({
                       >
                         <Card
                           className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors relative group ${
-                            book.isCompleted ? 'bg-green-100 border-green-500' : ''
-                          } ${book.isSelected ? 'border-2 border-black' : ''} ${
+                            book.is_completed ? 'bg-green-50' : ''
+                          } ${book.isSelected ? 'border-2 border-black' : `border-l-4 ${getStatusColorClass(book.progress)}`} ${
                             snapshot.isDragging ? 'shadow-lg' : ''
                           }`}
                           onClick={() => {
@@ -157,7 +165,7 @@ const BookGrid = ({
                                   {book.title}
                                 </h3>
                               )}
-                              {book.isCompleted && (
+                              {book.is_completed && (
                                 <div className="rounded-full bg-green-500 p-1">
                                   <Check className="w-4 h-4 text-white" />
                                 </div>

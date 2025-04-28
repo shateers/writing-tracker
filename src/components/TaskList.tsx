@@ -81,7 +81,7 @@ const TaskList = ({
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors relative group ${
-                        task.is_completed ? 'bg-green-100' : 'bg-white'
+                        task.is_completed ? 'bg-green-100 border-green-300' : 'bg-white'
                       } ${snapshot.isDragging ? 'shadow-lg' : ''}`}
                     >
                       <div {...provided.dragHandleProps} className="mr-2">
@@ -98,7 +98,7 @@ const TaskList = ({
                             onClick={handleInputClick}
                           />
                         ) : (
-                          <span className="text-sm">
+                          <span className={`text-sm ${task.is_completed ? 'line-through text-gray-500' : ''}`}>
                             {task.title}
                           </span>
                         )}
