@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -6,6 +5,7 @@ import { taskService, Task } from '../services/taskService';
 import TaskHeader from '../components/task/TaskHeader';
 import TaskContainer from '../components/task/TaskContainer';
 import TaskMutations from '../components/task/TaskMutations';
+import AppNavigation from '../components/AppNavigation';
 
 const Tasks = () => {
   const { bookId, stageId } = useParams();
@@ -46,6 +46,7 @@ const Tasks = () => {
           )}
         </TaskMutations>
       </div>
+      <AppNavigation />
     </div>
   );
 };

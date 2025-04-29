@@ -13,6 +13,7 @@ import {
   BreadcrumbList, 
   BreadcrumbSeparator 
 } from "@/components/ui/breadcrumb";
+import AppNavigation from '../components/AppNavigation';
 
 const Stages = () => {
   const navigate = useNavigate();
@@ -191,6 +192,7 @@ const Stages = () => {
           />
         </div>
       </div>
+      <AppNavigation />
     </div>
   );
 };

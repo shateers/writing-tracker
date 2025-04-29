@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import BookGrid from '../components/BookGrid';
 import { bookService } from '../services/bookService';
 import { useToast } from "@/components/ui/use-toast";
+import AppNavigation from '../components/AppNavigation';
 
 const Books = () => {
   const navigate = useNavigate();
@@ -134,6 +134,7 @@ const Books = () => {
           onReorderBooks={handleReorderBooks}
         />
       </div>
+      <AppNavigation />
     </div>
   );
 };
