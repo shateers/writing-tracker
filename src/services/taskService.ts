@@ -55,11 +55,11 @@ export const taskService = {
       .single();
     
     if (error) throw error;
-    return data as unknown as Task; // Type assertion to ensure compatibility
+    return data as unknown as Task;
   },
 
   async updateTask(id: string, updates: Partial<Task>) {
-    // Convert TaskReference[] to Json compatible format if it exists
+    // Convert TaskReference[] to Json compatible format if needed
     const supabaseUpdates = { ...updates };
     
     const { data, error } = await supabase
@@ -70,7 +70,7 @@ export const taskService = {
       .single();
     
     if (error) throw error;
-    return data as unknown as Task; // Type assertion to ensure compatibility
+    return data as unknown as Task;
   },
 
   async deleteTask(id: string) {
