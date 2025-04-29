@@ -11,6 +11,7 @@ import MostActiveItemsList from '../components/statistics/MostActiveItemsList';
 import ProgressComparisonChart from '../components/statistics/ProgressComparisonChart';
 import PeriodProgressSummary from '../components/statistics/PeriodProgressSummary';
 import { useToast } from "@/hooks/use-toast";
+import AppNavigation from '../components/AppNavigation';
 
 const Statistics = () => {
   const { toast } = useToast();
@@ -19,13 +20,15 @@ const Statistics = () => {
   const { data: books = [], isLoading: booksLoading } = useQuery({
     queryKey: ['books'],
     queryFn: bookService.getBooks,
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to load books data",
-        variant: "destructive",
-      });
-      console.error('Error loading books:', error);
+    meta: {
+      onError: (error: Error) => {
+        toast({
+          title: "Error",
+          description: "Failed to load books data",
+          variant: "destructive",
+        });
+        console.error('Error loading books:', error);
+      }
     }
   });
 
@@ -41,13 +44,15 @@ const Statistics = () => {
       return stagesResults.flat();
     },
     enabled: books.length > 0,
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to load stages data",
-        variant: "destructive",
-      });
-      console.error('Error loading stages:', error);
+    meta: {
+      onError: (error: Error) => {
+        toast({
+          title: "Error",
+          description: "Failed to load stages data",
+          variant: "destructive",
+        });
+        console.error('Error loading stages:', error);
+      }
     }
   });
 
@@ -63,13 +68,15 @@ const Statistics = () => {
       return tasksResults.flat();
     },
     enabled: allStages.length > 0,
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to load tasks data",
-        variant: "destructive",
-      });
-      console.error('Error loading tasks:', error);
+    meta: {
+      onError: (error: Error) => {
+        toast({
+          title: "Error",
+          description: "Failed to load tasks data",
+          variant: "destructive",
+        });
+        console.error('Error loading tasks:', error);
+      }
     }
   });
 
@@ -114,6 +121,7 @@ const Statistics = () => {
           </TabsContent>
         </Tabs>
       </div>
+      <AppNavigation />
     </div>
   );
 };

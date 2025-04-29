@@ -42,7 +42,7 @@ const TotalProgressCard = ({ books, stages, tasks }: TotalProgressCardProps) => 
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col items-center justify-center">
-              <CircularProgress value={averageBookProgress} maxValue={100} className="h-24 w-24" />
+              <CircularProgress value={averageBookProgress} className="h-24 w-24" />
               <p className="mt-2 text-sm text-muted-foreground">Average Progress</p>
             </div>
             <div className="space-y-4">
