@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
 
@@ -29,7 +28,11 @@ export const taskService = {
       .order('order_position', { ascending: true });
     
     if (error) throw error;
-    return data as unknown as Task[]; // Type assertion to ensure compatibility
+    
+    return (data || []).map(task => ({
+      ...task,
+      task_references: task.task_references as unknown as TaskReference[] | null
+    })) as Task[];
   },
 
   async createTask(stageId: string, title: string) {
@@ -55,12 +58,18 @@ export const taskService = {
       .single();
     
     if (error) throw error;
-    return data as unknown as Task;
+    
+    return {
+      ...data,
+      task_references: data.task_references as unknown as TaskReference[] | null
+    } as Task;
   },
 
   async updateTask(id: string, updates: Partial<Task>) {
-    // Convert TaskReference[] to Json compatible format if needed
-    const supabaseUpdates = { ...updates };
+    const supabaseUpdates = { 
+      ...updates,
+      task_references: updates.task_references as unknown as Json
+    };
     
     const { data, error } = await supabase
       .from('tasks')
@@ -70,7 +79,11 @@ export const taskService = {
       .single();
     
     if (error) throw error;
-    return data as unknown as Task;
+    
+    return {
+      ...data,
+      task_references: data.task_references as unknown as TaskReference[] | null
+    } as Task;
   },
 
   async deleteTask(id: string) {
