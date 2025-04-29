@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Plus } from 'lucide-react';
@@ -126,8 +127,8 @@ const Tasks = () => {
     }
   };
 
-  const handleUpdateTask = (taskId: string, newTitle: string) => {
-    updateTaskMutation.mutate({ id: taskId, updates: { title: newTitle } });
+  const handleUpdateTask = (taskId: string, updates: Partial<Task>) => {
+    updateTaskMutation.mutate({ id: taskId, updates });
   };
 
   const handleCreateTask = () => {

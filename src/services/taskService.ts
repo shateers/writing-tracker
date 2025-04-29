@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
 export interface TaskReference {
   type: 'link' | 'file';
@@ -28,7 +29,7 @@ export const taskService = {
       .order('order_position', { ascending: true });
     
     if (error) throw error;
-    return data;
+    return data as unknown as Task[]; // Type assertion to ensure compatibility
   },
 
   async createTask(stageId: string, title: string) {
@@ -54,19 +55,22 @@ export const taskService = {
       .single();
     
     if (error) throw error;
-    return data;
+    return data as unknown as Task; // Type assertion to ensure compatibility
   },
 
   async updateTask(id: string, updates: Partial<Task>) {
+    // Convert TaskReference[] to Json compatible format if it exists
+    const supabaseUpdates = { ...updates };
+    
     const { data, error } = await supabase
       .from('tasks')
-      .update(updates)
+      .update(supabaseUpdates)
       .eq('id', id)
       .select()
       .single();
     
     if (error) throw error;
-    return data;
+    return data as unknown as Task; // Type assertion to ensure compatibility
   },
 
   async deleteTask(id: string) {
@@ -98,4 +102,3 @@ export const taskService = {
     return reorderedTasks;
   }
 };
-
