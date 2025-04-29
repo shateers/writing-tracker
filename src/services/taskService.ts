@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
 
@@ -66,10 +67,16 @@ export const taskService = {
   },
 
   async updateTask(id: string, updates: Partial<Task>) {
-    const supabaseUpdates = { 
-      ...updates,
-      task_references: updates.task_references as unknown as Json
-    };
+    // Create a new object with all properties except task_references
+    const { task_references, ...otherUpdates } = updates;
+    
+    // Prepare the updates for Supabase
+    const supabaseUpdates: any = { ...otherUpdates };
+    
+    // Only add task_references if it's defined in the updates
+    if (task_references !== undefined) {
+      supabaseUpdates.task_references = task_references as unknown as Json;
+    }
     
     const { data, error } = await supabase
       .from('tasks')
